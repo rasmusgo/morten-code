@@ -426,9 +426,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     rec.log(
         "my_points",
-        &rerun::Points3D::new(points)
+        &rerun::Points3D::new(points.clone())
             .with_colors(colors)
             .with_radii([0.5]),
+    )?;
+    rec.log(
+        "lines",
+        &rerun::LineStrips3D::new([points]).with_colors(colors),
     )?;
 
     Ok(())
