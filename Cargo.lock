@@ -2759,6 +2759,7 @@ dependencies = [
 name = "morten-code"
 version = "0.1.0"
 dependencies = [
+ "rand",
  "rerun",
 ]
 

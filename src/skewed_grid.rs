@@ -1,3 +1,4 @@
+use rand::{rngs::SmallRng, Rng, SeedableRng};
 use rerun::external::glam;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -56,20 +57,35 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ]),
     )?;
 
+    let mut rng = SmallRng::seed_from_u64(89236740);
     for lod in 2..8 {
         rec.set_time_sequence("LOD", lod as i64);
         let n = 1 << lod;
         let node_radius = 0.6 / n as f32;
+        let jitter_radius = 0.5 / n as f32;
         let mut points = Vec::new();
         let positive_sphere_center = world_from_grid * glam::vec3(0.5, 0.5, 0.5);
         let positive_sphere_radius = 0.3;
-        let negative_sphere_center = world_from_grid * glam::vec3(0.25, 0.5, 0.5);
-        let negative_sphere_radius = 0.2;
+        let negative_sphere_center = world_from_grid * glam::vec3(0.35, 0.5, 0.5);
+        let negative_sphere_radius = 0.25;
         for i in 0..n {
             for j in 0..n {
                 for k in 0..n {
                     let p_in_grid = glam::vec3(i as f32, j as f32, k as f32) / n as f32;
-                    let p = world_from_grid * p_in_grid;
+                    let mut jitter = glam::vec3(
+                        rng.gen::<f32>() * jitter_radius,
+                        rng.gen::<f32>() * jitter_radius,
+                        rng.gen::<f32>() * jitter_radius,
+                    );
+                    // Reject samples outside the jitter radius.
+                    while jitter.length_squared() > jitter_radius * jitter_radius {
+                        jitter = glam::vec3(
+                            rng.gen::<f32>() * jitter_radius,
+                            rng.gen::<f32>() * jitter_radius,
+                            rng.gen::<f32>() * jitter_radius,
+                        );
+                    }
+                    let p = world_from_grid * p_in_grid + jitter;
                     if (p - negative_sphere_center).length() + node_radius < negative_sphere_radius
                     {
                         continue;
