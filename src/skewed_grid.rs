@@ -13,15 +13,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         glam::Mat3::from_cols_array_2d(&[[1.0, 0.0, 0.0], [0.5, cos_30, 0.0], z_axis.into()]);
     let mut points = Vec::new();
     let n = 100;
-    let edit_sphere_center =
+    let positive_sphere_center =
         skewed_from_straight * glam::vec3(0.5 * n as f32, 0.5 * n as f32, 0.5 * n as f32);
-    let edit_sphere_radius = 0.3 * n as f32;
+    let positive_sphere_radius = 0.3 * n as f32;
+    let negative_sphere_center =
+        skewed_from_straight * glam::vec3(0.25 * n as f32, 0.5 * n as f32, 0.5 * n as f32);
+    let negative_sphere_radius = 0.2 * n as f32;
     for i in 0..n {
         for j in 0..n {
             for k in 0..n {
                 let p_in_grid = glam::vec3(i as f32, j as f32, k as f32);
                 let p = skewed_from_straight * p_in_grid;
-                if (p - edit_sphere_center).length() < edit_sphere_radius {
+                if (p - negative_sphere_center).length() < negative_sphere_radius {
+                    continue;
+                }
+                if (p - positive_sphere_center).length() < positive_sphere_radius {
                     points.push(p);
                 }
             }
